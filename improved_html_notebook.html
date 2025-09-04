@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Jupiter Notebook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8f9fa;
+            color: #212529;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-bottom: 1px solid #dee2e6;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn.primary {
+            background: rgba(255,255,255,0.9);
+            color: #667eea;
+        }
+
+        .btn.primary:hover {
+            background: white;
+            color: #5a67d8;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #dee2e6;
+            padding: 16px;
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+            margin-left: -280px; /* Closed by default */
+        }
+
+        .sidebar.open {
+            margin-left: 0;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            left: 0px; /* Start at 0 since sidebar is closed by default */
+            top: 100px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 8px;
+            cursor: pointer;
+            border-radius: 0 6px 6px 0;
+            font-size: 14px;
+            z-index: 100;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .sidebar.open + .sidebar-toggle {
+            left: 280px;
+        }
+
+        .sidebar-toggle:hover {
+            background: #5a67d8;
+            transform: translateX(2px);
+        }
+
+        .sidebar h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #495057;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-category {
+            margin-bottom: 20px;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .tag-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            transition: all 0.2s ease;
+            text-align: left;
+            width: 100%;
+        }
+
+        .tag-item:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(4px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .explanation-banner {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-bottom: 1px solid #bbdefb;
+            padding: 16px 20px;
+            font-size: 13px;
+            line-height: 1.5;
+            display: none;
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.05);
+        }
+
+        .explanation-banner.show {
+            display: block;
+        }
+
+        .explanation-banner h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .notebook-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .cell {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 0;
+            margin-bottom: 2px;
+            position: relative;
+            display: flex;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .cell:first-child {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .cell:last-child {
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .cell.selected {
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+        }
+
+        .cell-prompt {
+            width: 80px; /* Reduced from 120px */
+            flex-shrink: 0;
+            background: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+            padding: 6px 8px; /* Reduced padding */
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: 11px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .cell-content {
+            flex: 1;
+            position: relative;
+        }
+
+        .cell-toolbar {
+            display: none;
+            position: absolute;
+            right: 8px;
+            top: 4px;
+            gap: 4px;
+            z-index: 10;
+            background: white;
+            border-radius: 4px;
+            padding: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .cell.selected .cell-toolbar {
+            display: flex;
+        }
+
+        .cell-btn {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+            padding: 4px 6px;
+            font-size: 10px;
+            cursor: pointer;
+            color: #495057;
+            transition: all 0.2s ease;
+        }
+
+        .cell-btn:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .cell-btn.run {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .cell-btn.run:hover {
+            background: #218838;
+        }
+
+        .cell-btn.delete {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .cell-btn.delete:hover {
+            background: #c82333;
+        }
+
+        .cell-input {
+            border: none;
+            padding: 8px 12px; /* Reduced padding */
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: 14px; /* Set to 14px as requested */
+            line-height: 1.4;
+            resize: none;
+            height: auto;
+            min-height: 32px; /* Reduced minimum height */
+            width: 100%;
+            background: transparent;
+            outline: none;
+            overflow: hidden;
+            color: #212529;
+        }
+
+        .cell-input:focus {
+            background: white;
+        }
+
+        .cell-output {
+            border-top: 1px solid #dee2e6;
+            background: #fefefe;
+            display: none;
+            min-height: 0; /* Allow output to be as small as content */
+        }
+
+        .cell-output.has-content {
+            display: block;
+        }
+
+        .cell-output iframe {
+            width: 100%;
+            border: none;
+            background: white;
+            display: block;
+        }
+
+        .add-cell {
+            text-align: center;
+            padding: 12px;
+            color: #6c757d;
+            cursor: pointer;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background: white;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .add-cell:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            color: #667eea;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 250px;
+                margin-left: -250px;
+            }
+            
+            .sidebar.open + .sidebar-toggle {
+                left: 250px;
+            }
+            
+            .cell-prompt {
+                width: 60px;
+                padding: 4px 6px;
+                font-size: 10px;
+            }
+            
+            .header {
+                padding: 8px 16px;
+            }
+            
+            .notebook-container {
+                padding: 15px;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">HTML Jupiter</div>
+        <div class="toolbar">
+            <button class="btn primary" onclick="NotebookAPI.addCell()">+ Cell</button>
+            <button class="btn" onclick="NotebookAPI.runAll()">▶ Run All</button>
+            <button class="btn" onclick="NotebookAPI.clearOutputs()">Clear</button>
+            <button class="btn" onclick="NotebookAPI.download()">Download</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar" id="sidebar">
+            <div class="tag-category">
+                <h3>Headings</h3>
+                <div class="tag-list">
+                    <span class="tag-item" onclick="TagManager.loadTag('h1')">h1</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('h2')">h2</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('h3')">h3</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('h4')">h4</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('h5')">h5</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('h6')">h6</span>
+                </div>
+            </div>
+
+            <div class="tag-category">
+                <h3>Text & Paragraphs</h3>
+                <div class="tag-list">
+                    <span class="tag-item" onclick="TagManager.loadTag('p')">p</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('br')">br</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('span')">span</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('div')">div</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('strong')">strong</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('em')">em</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('a')">a</span>
+                </div>
+            </div>
+
+            <div class="tag-category">
+                <h3>Lists</h3>
+                <div class="tag-list">
+                    <span class="tag-item" onclick="TagManager.loadTag('ul')">ul</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('ol')">ol</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('li')">li</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('dl')">dl</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('dt')">dt</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('dd')">dd</span>
+                </div>
+            </div>
+
+            <div class="tag-category">
+                <h3>Input & Buttons</h3>
+                <div class="tag-list">
+                    <span class="tag-item" onclick="TagManager.loadTag('button')">button</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('input')">input</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('textarea')">textarea</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('select')">select</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('option')">option</span>
+                </div>
+            </div>
+
+            <div class="tag-category">
+                <h3>Forms</h3>
+                <div class="tag-list">
+                    <span class="tag-item" onclick="TagManager.loadTag('form')">form</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('label')">label</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('fieldset')">fieldset</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('legend')">legend</span>
+                </div>
+            </div>
+
+            <div class="tag-category">
+                <h3>Tables</h3>
+                <div class="tag-list">
+                    <span class="tag-item" onclick="TagManager.loadTag('table')">table</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('tr')">tr</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('td')">td</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('th')">th</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('thead')">thead</span>
+                    <span class="tag-item" onclick="TagManager.loadTag('tbody')">tbody</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="sidebar-toggle" onclick="SidebarManager.toggle()">☰</button>
+
+        <div class="content-area">
+            <div class="explanation-banner" id="explanation">
+                <h4 id="explanation-title">Welcome to HTML Jupiter</h4>
+                <div id="explanation-text">Click the menu button (☰) to open the sidebar and select any HTML tag to load examples and explanations.</div>
+            </div>
+
+            <div class="notebook-container">
+                <div id="notebook">
+                    <!-- Cells will be added here -->
+                </div>
+                <div class="add-cell" onclick="NotebookAPI.addCell()">
+                    + Click to add a new cell
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // HTML Tag Database - External data structure
+        const HTMLTagsDB = {
+            // Headings
+            h1: {
+                title: "H1 - Main Heading",
+                description: "The h1 element represents the most important heading, typically used once per page for the main title.",
+                example: `<h1>Welcome to My Website</h1>`
+            },
+            h2: {
+                title: "H2 - Section Heading", 
+                description: "The h2 element represents a major section heading, used to divide content into main sections.",
+                example: `<h2>Section Title</h2>\n<p>Content goes here.</p>`
+            },
+            h3: {
+                title: "H3 - Subsection Heading",
+                description: "The h3 element represents a subsection heading, used within h2 sections.",
+                example: `<h3>Subsection</h3>\n<p>Subsection content.</p>`
+            },
+
+            // Text & Paragraphs
+            p: {
+                title: "P - Paragraph",
+                description: "The p element represents a paragraph of text. It's the most common way to display blocks of text.",
+                example: `<p>This is a paragraph of text.</p>`
+            },
+            div: {
+                title: "DIV - Division",
+                description: "The div element is a generic container used for styling and layout purposes.",
+                example: `<div style="padding: 10px; background: #f0f0f0;">\n  <p>Content in a div</p>\n</div>`
+            },
+            span: {
+                title: "SPAN - Inline Container", 
+                description: "The span element is an inline container used for styling specific parts of text.",
+                example: `<p>Text with <span style="color: blue;">colored span</span>.</p>`
+            },
+            strong: {
+                title: "STRONG - Strong Importance",
+                description: "The strong element indicates text with strong importance, typically displayed as bold.",
+                example: `<p>This is <strong>important text</strong>.</p>`
+            },
+            em: {
+                title: "EM - Emphasis",
+                description: "The em element indicates text that should be emphasized, typically displayed in italics.",
+                example: `<p>I <em>really</em> think this is important.</p>`
+            },
+            a: {
+                title: "A - Anchor/Link",
+                description: "The a element creates hyperlinks to other pages, files, locations, or anything else a URL can address.",
+                example: `<a href="https://www.example.com">Visit Example</a>`
+            },
+            br: {
+                title: "BR - Line Break",
+                description: "The br element produces a line break in text. Use sparingly - prefer proper block elements.",
+                example: `<p>First line<br>Second line</p>`
+            },
+
+            // Lists
+            ul: {
+                title: "UL - Unordered List",
+                description: "The ul element represents an unordered list of items, typically displayed with bullet points.",
+                example: `<ul>\n  <li>First item</li>\n  <li>Second item</li>\n</ul>`
+            },
+            ol: {
+                title: "OL - Ordered List",
+                description: "The ol element represents an ordered list of items, typically displayed with numbers.",
+                example: `<ol>\n  <li>Step one</li>\n  <li>Step two</li>\n</ol>`
+            },
+            li: {
+                title: "LI - List Item",
+                description: "The li element represents a single item in a list, used within ul or ol elements.",
+                example: `<ul>\n  <li>List item</li>\n</ul>`
+            },
+
+            // Forms & Inputs
+            form: {
+                title: "FORM - Form Container",
+                description: "The form element represents a section containing form controls for submitting information.",
+                example: `<form>\n  <input type="text" placeholder="Name">\n  <button type="submit">Submit</button>\n</form>`
+            },
+            input: {
+                title: "INPUT - Input Field",
+                description: "The input element is used to create interactive controls for forms to accept data from users.",
+                example: `<input type="text" placeholder="Enter text">`
+            },
+            button: {
+                title: "BUTTON - Button Element",
+                description: "The button element represents a clickable button used for submitting forms or triggering actions.",
+                example: `<button onclick="alert('Clicked!')">Click Me</button>`
+            },
+            textarea: {
+                title: "TEXTAREA - Multi-line Text Input",
+                description: "The textarea element provides a multi-line text input control.",
+                example: `<textarea placeholder="Enter message..."></textarea>`
+            },
+            select: {
+                title: "SELECT - Dropdown Menu",
+                description: "The select element represents a dropdown menu of options.",
+                example: `<select>\n  <option value="1">Option 1</option>\n  <option value="2">Option 2</option>\n</select>`
+            },
+
+            // Tables
+            table: {
+                title: "TABLE - Table Structure",
+                description: "The table element represents tabular data displayed in rows and columns.",
+                example: `<table border="1">\n  <tr>\n    <th>Name</th>\n    <th>Age</th>\n  </tr>\n  <tr>\n    <td>John</td>\n    <td>25</td>\n  </tr>\n</table>`
+            }
+        };
+
+        // Application State - In-memory storage instead of localStorage
+        const AppState = {
+            cells: [],
+            cellCounter: 0,
+            selectedCellId: null,
+            sidebarOpen: false, // Changed default to false
+            
+            // Methods for state persistence simulation
+            save() {
+                return {
+                    cells: this.cells.map(cell => ({
+                        id: cell.id,
+                        content: cell.input.value
+                    })),
+                    cellCounter: this.cellCounter
+                };
+            },
+            
+            load(data) {
+                if (data) {
+                    this.cellCounter = data.cellCounter || 0;
+                }
+            }
+        };
+
+        // Sidebar Management
+        const SidebarManager = {
+            toggle() {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('open');
+                AppState.sidebarOpen = sidebar.classList.contains('open');
+            }
+        };
+
+        // Tag Management System
+        const TagManager = {
+            loadTag(tagName) {
+                const tagData = HTMLTagsDB[tagName];
+                if (!tagData) return;
+
+                this.showExplanation(tagData);
+                this.loadExampleInCell(tagData.example);
+            },
+
+            showExplanation(tagData) {
+                const banner = document.getElementById('explanation');
+                const title = document.getElementById('explanation-title');
+                const text = document.getElementById('explanation-text');
+                
+                title.textContent = tagData.title;
+                text.textContent = tagData.description;
+                banner.classList.add('show');
+            },
+
+            hideExplanation() {
+                document.getElementById('explanation').classList.remove('show');
+            },
+
+            loadExampleInCell(example) {
+                // Add new cell with example or use selected cell
+                let targetCell = AppState.selectedCellId ? 
+                    document.getElementById(AppState.selectedCellId) : 
+                    CellManager.create();
+                
+                const input = targetCell.querySelector('.cell-input');
+                input.value = example;
+                CellManager.autoResize.call(input);
+                input.focus();
+            }
+        };
+
+        // Cell Management System  
+        const CellManager = {
+            create(content = '') {
+                AppState.cellCounter++;
+                const cellId = `cell-${AppState.cellCounter}`;
+                
+                const cellDiv = this.createElement(cellId, AppState.cellCounter, content);
+                this.attachEvents(cellDiv, cellId);
+                this.addToNotebook(cellDiv);
+                
+                const cellObj = {
+                    id: cellId,
+                    element: cellDiv,
+                    input: cellDiv.querySelector('.cell-input')
+                };
+                
+                AppState.cells.push(cellObj);
+                UI.selectCell(cellId);
+                return cellDiv;
+            },
+
+            createElement(cellId, cellNumber, content) {
+                const cellDiv = document.createElement('div');
+                cellDiv.className = 'cell';
+                cellDiv.id = cellId;
+                cellDiv.innerHTML = `
+                    <div class="cell-prompt">In [${cellNumber}]:</div>
+                    <div class="cell-content">
+                        <div class="cell-toolbar">
+                            <button class="cell-btn run" onclick="CodeRunner.runCell('${cellId}')">▶</button>
+                            <button class="cell-btn" onclick="CellManager.moveUp('${cellId}')">↑</button>
+                            <button class="cell-btn" onclick="CellManager.moveDown('${cellId}')">↓</button>
+                            <button class="cell-btn delete" onclick="CellManager.delete('${cellId}')">×</button>
+                        </div>
+                        <textarea class="cell-input" placeholder="Enter HTML code..." rows="1">${content}</textarea>
+                        <div class="cell-output"></div>
+                    </div>
+                `;
+                return cellDiv;
+            },
+
+            attachEvents(cellDiv, cellId) {
+                const input = cellDiv.querySelector('.cell-input');
+                
+                input.addEventListener('focus', () => UI.selectCell(cellId));
+                input.addEventListener('keydown', KeyboardHandler.handleCellKeydown);
+                input.addEventListener('input', this.autoResize);
+                
+                this.autoResize.call(input);
+            },
+
+            autoResize() {
+                this.style.height = 'auto';
+                const lineHeight = 20; // Approximate line height for 14px font
+                const lines = this.value.split('\n').length;
+                const minHeight = 32;
+                const maxHeight = Math.min(lines * lineHeight + 16, 200); // Max 200px
+                this.style.height = Math.max(minHeight, maxHeight) + 'px';
+            },
+
+            addToNotebook(cellDiv) {
+                const notebook = document.getElementById('notebook');
+                notebook.appendChild(cellDiv);
+                
+                const input = cellDiv.querySelector('.cell-input');
+                input.focus();
+            },
+
+            delete(cellId) {
+                if (AppState.cells.length <= 1) {
+                    alert('Cannot delete the last cell');
+                    return;
+                }
+                
+                const cell = document.getElementById(cellId);
+                cell.remove();
+                
+                AppState.cells = AppState.cells.filter(c => c.id !== cellId);
+                
+                if (AppState.cells.length > 0) {
+                    UI.selectCell(AppState.cells[0].id);
+                    AppState.cells[0].input.focus();
+                }
+            },
+
+            moveUp(cellId) {
+                const cell = document.getElementById(cellId);
+                const prev = cell.previousElementSibling;
+                if (prev && prev.classList.contains('cell')) {
+                    cell.parentNode.insertBefore(cell, prev);
+                }
+            },
+
+            moveDown(cellId) {
+                const cell = document.getElementById(cellId);
+                const next = cell.nextElementSibling;
+                if (next && next.classList.contains('cell')) {
+                    cell.parentNode.insertBefore(next, cell);
+                }
+            }
+        };
+
+        // Code Execution System
+        const CodeRunner = {
+            runCell(cellId) {
+                const cell = document.getElementById(cellId);
+                const input = cell.querySelector('.cell-input');
+                const output = cell.querySelector('.cell-output');
+                
+                const code = input.value.trim();
+                
+                if (!code) {
+                    this.clearOutput(output);
+                    return;
+                }
+
+                this.executeCode(output, code);
+            },
+
+            executeCode(output, code) {
+                const iframe = document.createElement('iframe');
+                iframe.style.width = '100%';
+                iframe.style.border = 'none';
+                iframe.style.display = 'block';
+                
+                output.innerHTML = '';
+                output.classList.add('has-content');
+                output.appendChild(iframe);
+                
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                doc.open();
+                doc.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <style>
+                            body { 
+                                margin: 8px; 
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+                                font-size: 14px; 
+                                line-height: 1.4;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${code}
+                    </body>
+                    </html>
+                `);
+                doc.close();
+
+                setTimeout(() => this.adjustIframeHeight(iframe, doc), 100);
+            },
+
+            adjustIframeHeight(iframe, doc) {
+                const contentHeight = doc.body.scrollHeight;
+                iframe.style.height = Math.max(contentHeight + 16, 40) + 'px';
+            },
+
+            clearOutput(output) {
+                output.innerHTML = '';
+                output.classList.remove('has-content');
+            },
+
+            runAll() {
+                AppState.cells.forEach(cell => {
+                    this.runCell(cell.id);
+                });
+            },
+
+            clearAllOutputs() {
+                document.querySelectorAll('.cell-output').forEach(output => {
+                    this.clearOutput(output);
+                });
+            }
+        };
+
+        // UI Management
+        const UI = {
+            selectCell(cellId) {
+                document.querySelectorAll('.cell').forEach(cell => {
+                    cell.classList.remove('selected');
+                });
+                
+                const cell = document.getElementById(cellId);
+                if (cell) {
+                    cell.classList.add('selected');
+                    AppState.selectedCellId = cellId;
+                }
+            },
+
+            deselectAll() {
+                document.querySelectorAll('.cell').forEach(cell => {
+                    cell.classList.remove('selected');
+                });
+                AppState.selectedCellId = null;
+            }
+        };
+
+        // Keyboard Event Handlers
+        const KeyboardHandler = {
+            handleCellKeydown(event) {
+                const cellId = event.target.closest('.cell').id;
+                
+                if (event.shiftKey && event.key === 'Enter') {
+                    event.preventDefault();
+                    CodeRunner.runCell(cellId);
+                    return;
+                }
+                
+                if ((event.ctrlKey || event.metaKey) && event.key === 'm') {
+                    event.preventDefault();
+                    CellManager.create();
+                    return;
+                }
+                
+                if (event.key === 'Delete' && event.target.value === '') {
+                    event.preventDefault();
+                    CellManager.delete(cellId);
+                    return;
+                }
+            }
+        };
+
+        // Public API for toolbar buttons
+        const NotebookAPI = {
+            addCell() {
+                CellManager.create();
+                TagManager.hideExplanation();
+            },
+
+            runAll() {
+                CodeRunner.runAll();
+            },
+
+            clearOutputs() {
+                CodeRunner.clearAllOutputs();
+            },
+
+            download() {
+                const notebookData = {
+                    cells: AppState.cells.map(cell => ({
+                        type: 'html',
+                        content: cell.input.value
+                    })),
+                    metadata: {
+                        created: new Date().toISOString(),
+                        cellCount: AppState.cellCounter
+                    }
+                };
+                
+                const dataStr = JSON.stringify(notebookData, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'html-notebook.json';
+                link.click();
+                
+                URL.revokeObjectURL(url);
+            }
+        };
+
+        // Application Initialization
+        const App = {
+            init() {
+                this.setupEventListeners();
+                this.loadInitialState();
+                this.createFirstCell();
+                this.showWelcome();
+            },
+
+            setupEventListeners() {
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        UI.deselectAll();
+                        TagManager.hideExplanation();
+                    }
+                });
+                
+                document.addEventListener('click', (event) => {
+                    if (!event.target.closest('.cell') && !event.target.closest('.add-cell')) {
+                        UI.deselectAll();
+                    }
+                });
+            },
+
+            loadInitialState() {
+                // In a real app with localStorage, we'd load saved state here
+                // AppState.load(JSON.parse(localStorage.getItem('htmlNotebook')));
+            },
+
+            createFirstCell() {
+                CellManager.create();
+            },
+
+            showWelcome() {
+                const banner = document.getElementById('explanation');
+                banner.classList.add('show');
+                
+                setTimeout(() => {
+                    if (!AppState.selectedCellId || 
+                        document.getElementById(AppState.selectedCellId).querySelector('.cell-input').value === '') {
+                        banner.classList.remove('show');
+                    }
+                }, 8000);
+            },
+
+            // Simulate saving state periodically
+            autoSave() {
+                const state = AppState.save();
+                // In real app: localStorage.setItem('htmlNotebook', JSON.stringify(state));
+                console.log('Auto-saved notebook state:', state);
+            }
+        };
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            App.init();
+            
+            // Set up auto-save every 30 seconds (commented out for demo)
+            // setInterval(() => App.autoSave(), 30000);
+        });
+    </script>
+</body>
+</html>
