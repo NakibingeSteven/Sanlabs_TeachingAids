@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sanlabs Computer Analogies</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px;
+  }
+  
+  .header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  }
+  
+  h1 {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  
+  .subtitle {
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+    color: #666;
+    font-weight: 400;
+  }
+  
+  .content-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  }
+  
+  .button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  }
+  
+  .analogy-btn {
+    background: white;
+    border: none;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .analogy-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  }
+  
+  .analogy-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    transform: translateY(-3px);
+  }
+  
+  .btn-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    display: block;
+  }
+  
+  .btn-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  
+  .btn-description {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    line-height: 1.4;
+  }
+  
+  .content-area {
+    padding: 30px;
+    min-height: 400px;
+  }
+  
+  .placeholder {
+    text-align: center;
+    color: #666;
+    font-size: 1.1rem;
+    padding: 60px 20px;
+  }
+  
+  .analogy-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #667eea;
+  }
+  
+  .analogy-icon {
+    font-size: 2.5rem;
+  }
+  
+  .analogy-title {
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    font-weight: 700;
+    color: #2c3e50;
+  }
+  
+  .analogy-description {
+    background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
+    border-left: 4px solid #667eea;
+    font-size: 1rem;
+  }
+  
+  .comparison-container {
+    margin: 25px 0;
+  }
+  
+  .comparison-item {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    border-left: 4px solid #667eea;
+    transition: transform 0.2s ease;
+  }
+  
+  .comparison-item:hover {
+    transform: translateX(5px);
+  }
+  
+  .component-name {
+    font-weight: 700;
+    color: #2c3e50;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  
+  .equivalent {
+    font-weight: 600;
+    color: #667eea;
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+  
+  .explanation {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  
+  .key-insights {
+    background: linear-gradient(135deg, #fff3e0, #fce4ec);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 25px 0;
+  }
+  
+  .insights-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .insight-item {
+    background: white;
+    padding: 12px 15px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border-left: 3px solid #ff9800;
+    font-size: 0.95rem;
+  }
+  
+  /* Mobile Optimizations */
+  @media (max-width: 768px) {
+    .container {
+      padding: 5px;
+    }
+    
+    .header {
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .button-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 15px;
+    }
+    
+    .analogy-btn {
+      padding: 15px;
+    }
+    
+    .btn-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    
+    .content-area {
+      padding: 20px 15px;
+    }
+    
+    .analogy-header {
+      flex-direction: column;
+      text-align: center;
+      gap: 10px;
+    }
+    
+    .comparison-item {
+      padding: 15px;
+      margin: 10px 0;
+    }
+    
+    .component-name {
+      font-size: 1rem;
+    }
+    
+    .equivalent {
+      font-size: 0.95rem;
+    }
+    
+    .explanation {
+      font-size: 0.9rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .container {
+      padding: 3px;
+    }
+    
+    .header {
+      padding: 12px;
+      border-radius: 15px;
+    }
+    
+    .content-wrapper {
+      border-radius: 15px;
+    }
+    
+    .button-grid {
+      padding: 10px;
+      gap: 8px;
+    }
+    
+    .analogy-btn {
+      padding: 12px;
+    }
+    
+    .content-area {
+      padding: 15px 10px;
+    }
+    
+    .analogy-description {
+      padding: 15px;
+    }
+    
+    .comparison-item {
+      padding: 12px;
+    }
+    
+    .key-insights {
+      padding: 15px;
+    }
+  }
+  
+  /* Smooth animations */
+  .fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Sanlabs Computer Analogies</h1>
+    <p class="subtitle">Understanding technology through familiar comparisons</p>
+  </div>
+  
+  <div class="content-wrapper">
+    <div class="button-grid">
+      <button class="analogy-btn" onclick="showAnalogy('human')" id="btn-human">
+        <span class="btn-icon">🧠</span>
+        <div class="btn-title">Human Body</div>
+        <div class="btn-description">Compare computer parts to body organs and systems</div>
+      </button>
+      
+      <button class="analogy-btn" onclick="showAnalogy('kitchen')" id="btn-kitchen">
+        <span class="btn-icon">👨‍🍳</span>
+        <div class="btn-title">Kitchen & Chef</div>
+        <div class="btn-description">Think of computing like cooking and food preparation</div>
+      </button>
+      
+      <button class="analogy-btn" onclick="showAnalogy('city')" id="btn-city">
+        <span class="btn-icon">🏙️</span>
+        <div class="btn-title">City Infrastructure</div>
+        <div class="btn-description">Computer systems work like a well-organized city</div>
+      </button>
+      
+      <button class="analogy-btn" onclick="showAnalogy('school')" id="btn-school">
+        <span class="btn-icon">🎓</span>
+        <div class="btn-title">School System</div>
+        <div class="btn-description">Educational institution managing information flow</div>
+      </button>
+      
+      <button class="analogy-btn" onclick="showAnalogy('orchestra')" id="btn-orchestra">
+        <span class="btn-icon">🎼</span>
+        <div class="btn-title">Orchestra</div>
+        <div class="btn-description">Harmonious coordination of different instruments</div>
+      </button>
+      
+      <button class="analogy-btn" onclick="showAnalogy('hospital')" id="btn-hospital">
+        <span class="btn-icon">🏥</span>
+        <div class="btn-title">Hospital System</div>
+        <div class="btn-description">Efficient patient care and information management</div>
+      </button>
+    </div>
+    
+    <div class="content-area">
+      <div class="placeholder">
+        <div style="font-size: 3rem; margin-bottom: 20px;">🖥️</div>
+        <div>Select an analogy above to explore how computers work</div>
+        <div style="font-size: 0.9rem; margin-top: 10px; opacity: 0.7;">Choose any comparison that interests you most!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const analogies = {
+  human: {
+    icon: "🧠",
+    title: "Human Body System",
+    description: "Just like the human body, a computer is a complex system where different parts work together harmoniously to process information, make decisions, and interact with the world.",
+    comparisons: [
+      {
+        component: "CPU (Central Processing Unit)",
+        equivalent: "Brain",
+        explanation: "The brain processes thoughts, makes decisions, and controls all body functions, just like the CPU processes data and controls computer operations."
+      },
+      {
+        component: "Memory (RAM)",
+        equivalent: "Short-term Memory",
+        explanation: "Your working memory holds information you're currently thinking about, similar to how RAM temporarily stores data the CPU is actively using."
+      },
+      {
+        component: "Storage (Hard Drive)",
+        equivalent: "Long-term Memory",
+        explanation: "Your brain stores memories and knowledge for years, just like storage devices keep files and programs permanently available."
+      },
+      {
+        component: "Motherboard",
+        equivalent: "Nervous System",
+        explanation: "Nerves connect different body parts and carry signals, similar to how the motherboard connects components and carries electrical signals."
+      },
+      {
+        component: "Power Supply",
+        equivalent: "Heart & Circulatory System",
+        explanation: "The heart pumps blood to provide energy to all organs, like how power supply provides electricity to all computer components."
+      },
+      {
+        component: "Input Devices",
+        equivalent: "Senses (Eyes, Ears, Touch)",
+        explanation: "Our senses gather information from the environment, similar to keyboards, mice, and cameras collecting input for the computer."
+      },
+      {
+        component: "Output Devices",
+        equivalent: "Voice, Movement, Expressions",
+        explanation: "We express ourselves through speech and actions, like how monitors and speakers display computer output."
+      }
+    ],
+    insights: [
+      "Both systems process information and make intelligent decisions",
+      "Both have different types of memory for different purposes",
+      "Both can learn, adapt, and improve performance over time",
+      "Both need energy to function and have complex communication networks",
+      "Both can multitask but have processing limitations"
+    ]
+  },
+  
+  kitchen: {
+    icon: "👨‍🍳",
+    title: "Kitchen & Chef System",
+    description: "A computer works like a professional kitchen where a skilled chef (CPU) uses various tools and ingredients to create meals following recipes (programs).",
+    comparisons: [
+      {
+        component: "CPU (Central Processing Unit)",
+        equivalent: "Head Chef",
+        explanation: "The head chef coordinates all cooking activities, makes decisions about timing and preparation, and ensures everything works together smoothly."
+      },
+      {
+        component: "Memory (RAM)",
+        equivalent: "Kitchen Counter Space",
+        explanation: "Counter space holds ingredients and tools you're currently using, similar to how RAM temporarily holds data being actively processed."
+      },
+      {
+        component: "Storage (Hard Drive)",
+        equivalent: "Pantry & Refrigerator",
+        explanation: "The pantry stores ingredients long-term until needed, just like storage keeps files and programs permanently available."
+      },
+      {
+        component: "Programs/Software",
+        equivalent: "Recipes & Cooking Methods",
+        explanation: "Recipes provide step-by-step instructions to create dishes, similar to how programs give computers instructions to complete tasks."
+      },
+      {
+        component: "Input Devices",
+        equivalent: "Grocery Deliveries & Orders",
+        explanation: "Raw ingredients come into the kitchen to be processed, like how input devices provide data for the computer to work with."
+      },
+      {
+        component: "Output Devices",
+        equivalent: "Finished Dishes & Presentation",
+        explanation: "The kitchen produces completed meals for customers, similar to how output devices display results and information."
+      },
+      {
+        component: "Operating System",
+        equivalent: "Kitchen Management System",
+        explanation: "Kitchen organization ensures efficient workflow and resource allocation, like how the OS manages computer resources and processes."
+      }
+    ],
+    insights: [
+      "Both follow step-by-step processes to transform inputs into outputs",
+      "Both need good organization and timing to work efficiently",
+      "Both can handle multiple tasks simultaneously with proper coordination",
+      "Both require proper tools and ingredients/data to produce quality results",
+      "Both benefit from experienced management and clear procedures"
+    ]
+  },
+  
+  city: {
+    icon: "🏙️",
+    title: "City Infrastructure",
+    description: "A computer system operates like a well-planned city with different districts, transportation networks, and services all working together to serve residents (data and programs).",
+    comparisons: [
+      {
+        component: "CPU (Central Processing Unit)",
+        equivalent: "City Hall & Mayor's Office",
+        explanation: "City Hall coordinates all municipal services and makes important decisions, similar to how the CPU manages and processes all computer operations."
+      },
+      {
+        component: "Memory (RAM)",
+        equivalent: "Downtown Business District",
+        explanation: "The busy downtown area handles active daily business and commerce, like how RAM manages currently running programs and active data."
+      },
+      {
+        component: "Storage (Hard Drive)",
+        equivalent: "Residential Areas & Archives",
+        explanation: "Residential neighborhoods house people long-term, and archives store historical records, similar to how storage keeps files permanently."
+      },
+      {
+        component: "Network Connection",
+        equivalent: "Highways & Transportation",
+        explanation: "Roads and highways connect the city to other places, allowing travel and trade, like how networks connect computers for communication."
+      },
+      {
+        component: "Programs/Applications",
+        equivalent: "City Services & Departments",
+        explanation: "Different city departments (police, fire, utilities) provide specific services, similar to how programs perform specific computer tasks."
+      },
+      {
+        component: "Operating System",
+        equivalent: "City Management & Planning",
+        explanation: "City planning coordinates all services and infrastructure efficiently, like how the OS manages computer resources and processes."
+      },
+      {
+        component: "Firewall/Security",
+        equivalent: "Police & Security Services",
+        explanation: "Police protect the city from crime and maintain order, similar to how firewalls protect computers from threats and malicious activity."
+      }
+    ],
+    insights: [
+      "Both require efficient resource management and coordination",
+      "Both have specialized areas for different types of activities",
+      "Both need security systems to protect against threats",
+      "Both benefit from good planning and infrastructure",
+      "Both can grow and adapt to changing needs over time"
+    ]
+  },
+  
+  school: {
+    icon: "🎓",
+    title: "School System",
+    description: "A computer functions like a comprehensive school where information is processed, stored, and retrieved efficiently to help students (users) learn and accomplish their goals.",
+    comparisons: [
+      {
+        component: "CPU (Central Processing Unit)",
+        equivalent: "Principal & Administration",
+        explanation: "The principal makes key decisions, coordinates activities, and ensures the school runs smoothly, like how the CPU manages all computer operations."
+      },
+      {
+        component: "Memory (RAM)",
+        equivalent: "Classrooms in Use",
+        explanation: "Active classrooms hold students and lessons currently happening, similar to how RAM temporarily stores data being actively processed."
+      },
+      {
+        component: "Storage (Hard Drive)",
+        equivalent: "Library & Archives",
+        explanation: "The library stores books and records for long-term access, just like storage keeps files and programs permanently available."
+      },
+      {
+        component: "Programs/Applications",
+        equivalent: "Different Subject Classes",
+        explanation: "Math, science, and art classes each teach specific skills, similar to how different programs perform specific computer tasks."
+      },
+      {
+        component: "Input Devices",
+        equivalent: "Student Enrollment & Assignments",
+        explanation: "New students and homework assignments bring information into the school system, like how input devices provide data to computers."
+      },
+      {
+        component: "Output Devices",
+        equivalent: "Report Cards & Graduation",
+        explanation: "Schools produce educated students and certificates, similar to how output devices display computer results and information."
+      },
+      {
+        component: "Network Connection",
+        equivalent: "Communication System",
+        explanation: "Intercom systems and networks connect classrooms and other schools, like how computer networks enable communication and resource sharing."
+      }
+    ],
+    insights: [
+      "Both organize and process large amounts of information systematically",
+      "Both have specialized areas for different types of learning/processing",
+      "Both help users accomplish goals through structured processes",
+      "Both maintain records and track progress over time",
+      "Both can adapt curriculum/software to meet changing needs"
+    ]
+  },
+  
+  orchestra: {
+    icon: "🎼",
+    title: "Symphony Orchestra",
+    description: "A computer operates like a symphony orchestra where different instruments (components) work together under a conductor's direction to create beautiful music (accomplish computing tasks).",
+    comparisons: [
+      {
+        component: "CPU (Central Processing Unit)",
+        equivalent: "Conductor",
+        explanation: "The conductor coordinates all musicians, sets the tempo, and ensures everyone plays together harmoniously, like how the CPU coordinates all computer components."
+      },
+      {
+        component: "Memory (RAM)",
+        equivalent: "Music Stands & Sheet Music",
+        explanation: "Music stands hold the pieces musicians are currently playing, similar to how RAM temporarily holds data being actively processed."
+      },
+      {
+        component: "Storage (Hard Drive)",
+        equivalent: "Music Library & Archives",
+        explanation: "The orchestra's music library stores all compositions for future performances, like how storage keeps files and programs permanently."
+      },
+      {
+        component: "Different Components",
+        equivalent: "Instrument Sections",
+        explanation: "Strings, brass, woodwinds, and percussion each have unique roles, similar to how different computer components have specialized functions."
+      },
+      {
+        component: "Programs/Applications",
+        equivalent: "Musical Compositions",
+        explanation: "Different pieces of music require specific arrangements and techniques, like how programs provide instructions for specific computer tasks."
+      },
+      {
+        component: "Operating System",
+        equivalent: "Concert Management",
+        explanation: "Concert planning coordinates rehearsals, scheduling, and resources, similar to how the OS manages computer resources and processes."
+      },
+      {
+        component: "Input/Output",
+        equivalent: "Audience & Performance",
+        explanation: "The audience provides appreciation and feedback while receiving beautiful music, like how users provide input and receive computer output."
+      }
+    ],
+    insights: [
+      "Both require precise timing and coordination between multiple parts",
+      "Both create something greater than the sum of their individual parts",
+      "Both need leadership and management to function effectively",
+      "Both can perform complex tasks through practiced collaboration",
+      "Both produce results that serve and benefit their audience/users"
+    ]
+  },
+  
+  hospital: {
+    icon: "🏥",
+    title: "Hospital System",
+    description: "A computer works like a modern hospital where different departments coordinate efficiently to process patients (data) and provide the right care (processing) quickly and accurately.",
+    comparisons: [
+      {
+        component: "CPU (Central Processing Unit)",
+        equivalent: "Emergency Room & Chief of Staff",
+        explanation: "The ER triages patients and the chief coordinates all departments, making critical decisions, similar to how the CPU prioritizes and processes all computer tasks."
+      },
+      {
+        component: "Memory (RAM)",
+        equivalent: "Patient Rooms & Active Care Units",
+        explanation: "Patient rooms house those currently receiving treatment, like how RAM temporarily holds data being actively processed by the computer."
+      },
+      {
+        component: "Storage (Hard Drive)",
+        equivalent: "Medical Records & Archives",
+        explanation: "Patient files and medical histories are stored long-term for future reference, similar to how storage keeps files and programs permanently."
+      },
+      {
+        component: "Programs/Applications",
+        equivalent: "Medical Procedures & Protocols",
+        explanation: "Different medical procedures follow specific steps to treat conditions, like how programs provide step-by-step instructions for computer tasks."
+      },
+      {
+        component: "Input Devices",
+        equivalent: "Admission & Diagnostic Equipment",
+        explanation: "Patients arrive and diagnostic tools gather medical information, similar to how input devices provide data for computer processing."
+      },
+      {
+        component: "Output Devices",
+        equivalent: "Treatment Results & Discharge",
+        explanation: "Patients leave healthier with treatment reports, like how output devices display computer processing results and information."
+      },
+      {
+        component: "Network System",
+        equivalent: "Hospital Communication Network",
+        explanation: "Paging systems and networks connect departments and other hospitals, enabling coordination and information sharing like computer networks."
+      }
+    ],
+    insights: [
+      "Both prioritize urgent tasks and manage multiple cases simultaneously",
+      "Both maintain detailed records and follow established protocols",
+      "Both require different specialists working together efficiently",
+      "Both process complex information to provide appropriate responses",
+      "Both focus on serving their patients/users with accuracy and speed"
+    ]
+  }
+};
+
+let currentAnalogy = null;
+
+function showAnalogy(type) {
+  // Remove active class from all buttons
+  document.querySelectorAll('.analogy-btn').forEach(btn => btn.classList.remove('active'));
+  // Add active class to clicked button
+  document.getElementById(`btn-${type}`).classList.add('active');
+  
+  currentAnalogy = type;
+  const analogy = analogies[type];
+  
+  const content = `
+    <div class="fade-in">
+      <div class="analogy-header">
+        <span class="analogy-icon">${analogy.icon}</span>
+        <div class="analogy-title">${analogy.title}</div>
+      </div>
+      
+      <div class="analogy-description">
+        ${analogy.description}
+      </div>
+      
+      <div class="comparison-container">
+        ${analogy.comparisons.map(item => `
+          <div class="comparison-item">
+            <div class="component-name">${item.component}</div>
+            <div class="equivalent">↔️ ${item.equivalent}</div>
+            <div class="explanation">${item.explanation}</div>
+          </div>
+        `).join('')}
+      </div>
+      
+      <div class="key-insights">
+        <div class="insights-title">
+          <span>💡</span>
+          Key Insights
+        </div>
+        ${analogy.insights.map(insight => `
+          <div class="insight-item">${insight}</div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  
+  document.querySelector('.content-area').innerHTML = content;
+}
+</script>
+</body>
+</html>
